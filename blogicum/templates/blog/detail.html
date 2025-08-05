@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ post.location }}. {{ post.date }}{% endblock %}
+
+<!-- Основное содержимое страницы -->
+{% block content %}
+<div class="container py-5">
+    <article>
+      <ul>
+        <li>
+          Место: {{ post.location }}  <!-- Место создания поста -->           
+        </li>
+        <li>
+          Дата: {{ post.date }}  <!-- Дата публикации -->
+        </li>
+        <li>
+          Категория: 
+          <!-- Ссылка на список постов этой категории -->
+          <a href="{% url 'blog:category_posts' post.category|slugify %}">
+          {{ post.category }}
+        </a>
+        </li>
+      </ul>
+
+      <!-- Основной текст поста с сохранением переносов строк -->       
+      <p>{{ post.text|linebreaksbr }}</p>          
+    </article>                
+  </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+<!-- Заголовок страницы -->
+{% block title %}Лента записей{% endblock %}
+
+<!-- Основное содержимое страницы -->
+{% block content %}
+  <h1>Лента записей</h1>  <!-- Основной заголовок страницы -->
+  <hr>
+  <article>
+    <ul>  <!-- Неупорядоченный список постов -->
+    <!-- Перебираем в цикле все посты -->
+    {% for post in posts %}
+      <li>Место: {{ post.location }}</li>  <!-- Место создания поста -->
+      <li>Дата: {{ post.date }}</li>  <!-- Дата публикации -->
+      
+      <!-- Категория поста с ссылкой -->
+      <li>Категория: <a href="
+        {% url 'blog:category_posts' post.category|slugify %}">
+          {{ post.category }}
+        </a>
+      </li>
+
+      <!-- Краткий текст поста (первые 10 слов) -->
+      <p>{{ post.text|truncatewords:10 }}</p>
+
+      <!-- Ссылка на полную версию поста -->
+      <a href="{% url 'blog:post_detail' post.id %}">Читать полный текст</a>
+      <hr>
+    {% endfor %}
+    </ul>
+  </article>            
+{% endblock %}
