@@ -108,14 +108,8 @@ def category_posts(request, post_category):
         и название категории
     """
     template = 'blog/category.html'
-    try:
-        # Фильтруем посты по категории/
-        filtered_posts = [post for post in posts
-                          if post['category'] == post_category]
-        context = {'posts': filtered_posts, 'category': post_category}
-        if not filtered_posts:
-            raise Http404("Категория не найдена или не содержит постов")
-        return render(request, template, context)
+    filtered_posts = [post for post in posts
+                      if post['category'] == post_category]
+    context = {'posts': filtered_posts, 'category': post_category}
 
-    except Exception:
-        raise Http404("Произошла ошибка при загрузке категории")
+    return render(request, template, context)
