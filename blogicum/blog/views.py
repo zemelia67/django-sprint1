@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import Http404
 
 # Список словарей с данными постов блога
 posts = [
@@ -57,7 +58,8 @@ def index(request):
         содержащим перевернутый список постов
     """
     template = 'blog/index.html'
-    context = {'posts': posts[::-1]}
+    newlist = sorted(posts, key=lambda d: -d['id'])
+    context = {'posts': newlist}
     return render(request, template, context)
 
 
@@ -77,8 +79,19 @@ def post_detail(request, post_id):
         При несуществующем post_id вызовет IndexError
     """
     template = 'blog/detail.html'
-    context = {'post': posts[post_id]}
-    return render(request, template, context)
+    try:
+        # Преобразуем post_id в число (на случай если пришла строка)/
+        post_id = int(post_id)
+
+        # Проверяем что ID находится в допустимом диапазоне
+        if post_id < 0 or post_id >= len(posts):
+            raise IndexError("ID поста вне допустимого диапазона")
+
+        post = posts[post_id]
+        context = {'post': post}
+        return render(request, template, context)
+    except (IndexError):
+        raise Http404("Некорректный ID поста")
 
 
 def category_posts(request, post_category):
@@ -95,7 +108,14 @@ def category_posts(request, post_category):
         и название категории
     """
     template = 'blog/category.html'
-    filtered_posts = [post for post in posts
-                      if post['category'] == post_category]
-    context = {'posts': filtered_posts, 'category': post_category}
-    return render(request, template, context)
+    try:
+        # Фильтруем посты по категории/
+        filtered_posts = [post for post in posts
+                          if post['category'] == post_category]
+        context = {'posts': filtered_posts, 'category': post_category}
+        if not filtered_posts:
+            raise Http404("Категория не найдена или не содержит постов")
+        return render(request, template, context)
+
+    except Exception:
+        raise Http404("Произошла ошибка при загрузке категории")
